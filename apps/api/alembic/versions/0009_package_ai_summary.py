@@ -1,0 +1,29 @@
+"""Add ai_summary to architecture_packages
+
+Revision ID: 0009_package_ai_summary
+Revises: 0008_package_citations
+Create Date: 2026-07-30
+"""
+
+from __future__ import annotations
+
+from typing import Sequence, Union
+
+import sqlalchemy as sa
+from alembic import op
+
+revision: str = "0009_package_ai_summary"
+down_revision: Union[str, None] = "0008_package_citations"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    op.add_column(
+        "architecture_packages",
+        sa.Column("ai_summary", sa.Text(), nullable=True),
+    )
+
+
+def downgrade() -> None:
+    op.drop_column("architecture_packages", "ai_summary")

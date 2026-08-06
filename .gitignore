@@ -1,0 +1,41 @@
+.DS_Store
+**/.DS_Store
+.worktrees/
+.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+.env
+*.pyc
+node_modules/
+**/.next/
+.superpowers/
+.claude/
+/superpower
+/superpowers
+**/superpowers/
+docs/superpowers/
+docs/ai-gateway-design-exploration.md
+docs/*-exploration.md
+
+# Local / planning docs (not shipped)
+docs/PRODUCT_REQUIREMENTS.md
+docs/PRODUCT_ROADMAP.md
+docs/README.md
+
+# Local knowledge seed / uploads (not shipped in git)
+/knowledge/
+
+# Local UX mockups / diagram drafts (not shipped in git)
+/docs/diagrams/
+
+# Generated knowledge-graph / agent caches
+graphify-out/
+**/graphify-out/
+
+# TypeScript incremental build info
+*.tsbuildinfo

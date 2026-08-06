@@ -1,0 +1,38 @@
+/* Archavow UI tokens — redesign color template */
+:root {
+  --color-bg: #f4f1ea;
+  --color-surface: #ebe6dc;
+  --color-text: #1c1a16;
+  --color-accent: #2f5d50;
+  --color-accent-700: #1f3f36;
+  --color-divider: #cfc7b8;
+  --color-neutral-200: #ddd6c8;
+  /* State colors, muted to sit inside the cream palette rather than shout. */
+  --color-warn: #8a6a25;
+  --color-danger: #8a3a32;
+  --font-heading: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  /* Structural spacing scales with the viewport; small steps stay fixed so
+     borders, tags and icon gaps keep their proportions. */
+  --space-6: clamp(16px, 1.2vw + 12px, 24px);
+  --space-8: clamp(22px, 2vw + 15px, 36px);
+  /* Content width grows with the viewport but stays within a readable measure. */
+  --page-pad: clamp(16px, 3vw, 44px);
+  --page-measure: clamp(320px, 84vw, 1080px);
+  --page-measure-wide: clamp(320px, 93vw, 1560px);
+  --aside-width: clamp(240px, 22vw, 330px);
+  --text-body: clamp(14px, 0.25vw + 13.2px, 16px);
+  --text-h1: clamp(25px, 2.1vw + 16px, 40px);
+  --text-h2: clamp(16px, 0.55vw + 14.2px, 20px);
+  --shadow-md: 0 1px 0 rgba(28, 26, 22, 0.08);
+  --radius: 0;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 180ms;
+  --motion-med: 320ms;
+  --motion-slow: 520ms;
+}

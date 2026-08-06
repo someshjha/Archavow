@@ -1,0 +1,18 @@
+# Local development defaults for Archavow.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  postgres:
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-archavow}
+      POSTGRES_USER: ${POSTGRES_USER:-archavow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-archavow}
+
+  api:
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-archavow}:${POSTGRES_PASSWORD:-archavow}@postgres:5432/${POSTGRES_DB:-archavow}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      AI_CHAT_PROVIDER: ${AI_CHAT_PROVIDER:-ollama}
+      AI_EMBEDDING_PROVIDER: ${AI_EMBEDDING_PROVIDER:-none}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

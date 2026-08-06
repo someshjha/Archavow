@@ -1,0 +1,9 @@
+{
+  "name": "@archavow/ui-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Archavow redesign color tokens (cream / blueprint). Interaction libs (motion, lenis) come from ExecOS patterns.",
+  "exports": {
+    "./tokens.css": "./src/tokens.css"
+  }
+}
