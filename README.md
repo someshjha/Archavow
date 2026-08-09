@@ -127,7 +127,7 @@ Business stories trace to intake requirements. Cross-cutting technical enablers 
 
 - Docker with Compose
 - Git
-- Optional: Ollama or an OpenAI API key
+- [Ollama](https://ollama.com) — required for the default configuration (chat via a local model). Install with `brew install ollama` (macOS) or `curl -fsSL https://ollama.com/install.sh | sh` (Linux). `make up` starts the server and pulls the default model (`llama3.2`) automatically if it isn't already there — set `AI_CHAT_PROVIDER=openai` in `.env` instead if you'd rather use OpenAI and skip installing Ollama.
 
 ```bash
 git clone https://github.com/someshjha/Archavow.git
@@ -142,7 +142,7 @@ Open:
 - API health: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
 - API documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-The default configuration uses Ollama for chat and disables embeddings. If no model is available, the core workflow continues with labeled deterministic fallbacks.
+The default configuration uses Ollama for chat and disables embeddings. `make up` checks that Ollama is installed and running and pulls `llama3.2` before starting the stack — see Requirements above. If a chat request still fails at runtime for some other reason (model removed after startup, server killed mid-session, etc.), the core workflow continues with labeled deterministic fallbacks rather than blocking.
 
 ```bash
 make logs       # follow API and web logs
@@ -196,6 +196,8 @@ ALLOW_PRIVATE_AI_URLS=true
 OLLAMA_CHAT_MODEL=llama3.2
 OLLAMA_EMBEDDING_MODEL=nomic-embed-text
 ```
+
+`make up` only pulls the default chat model (`llama3.2`) automatically. If you turn on Ollama embeddings (`AI_EMBEDDING_PROVIDER=ollama`), pull the embedding model yourself first: `ollama pull nomic-embed-text`.
 
 Example OpenAI configuration:
 
