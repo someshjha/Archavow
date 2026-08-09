@@ -1,13 +1,11 @@
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
-import { Stepper } from "@/components/Stepper";
 import { OnboardingForm } from "./OnboardingForm";
 
 export default function NewProjectPage() {
   return (
-    <AppShell wide>
+    <AppShell wide stage="intake">
       <Reveal>
-        <Stepper current="intake" />
         <h1>Project onboarding</h1>
         <p className="lede">
           Frame the problem, constraints, and success targets. Next, the interview

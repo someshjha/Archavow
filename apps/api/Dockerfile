@@ -10,7 +10,7 @@ COPY apps/api/pyproject.toml apps/api/README.md ./
 COPY apps/api/app ./app
 COPY apps/api/alembic ./alembic
 COPY apps/api/alembic.ini ./alembic.ini
-COPY knowledge ./knowledge
+
 
 RUN pip install --no-cache-dir -e .
 

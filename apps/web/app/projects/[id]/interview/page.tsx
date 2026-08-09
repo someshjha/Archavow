@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getProject } from "@/lib/api";
 import { InterviewClient } from "./InterviewClient";
 
@@ -21,9 +21,14 @@ export default async function InterviewPage({
   }
 
   return (
-    <AppShell wide>
+    <AppShell
+      wide
+      projectId={id}
+      stage="interview"
+      reachedStage={reached}
+      evidenceRail={false}
+    >
       <Reveal>
-        <Stepper current="interview" projectId={id} reachedStage={reached} />
         <h1>{title}</h1>
         <p className="lede">
           Fill the gaps as they come up. Completeness stays on the right, not lost

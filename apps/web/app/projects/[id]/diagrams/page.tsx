@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { BackLink } from "@/components/BackLink";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getPackage, getProject } from "@/lib/api";
 import { DiagramsClient } from "./DiagramsClient";
 
@@ -27,9 +28,9 @@ export default async function DiagramsPage({
   const docs = pkg?.documents || {};
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage="package" reachedStage={reached}>
       <Reveal>
-        <Stepper current="package" projectId={id} reachedStage={reached} />
+        <BackLink>← Back to package</BackLink>
         <h1>Architecture diagrams</h1>
         <p className="lede">
           C4 levels 1–3, the key interaction sequence, and a labeled data flow
@@ -57,15 +58,6 @@ export default async function DiagramsPage({
               dataflow: docs.diagram_dataflow,
             }}
           />
-
-          <div className="form-actions" style={{ marginTop: 24 }}>
-            <Link href={`/projects/${id}/package`} className="btn">
-              Package
-            </Link>
-            <Link href={`/projects/${id}`} className="btn">
-              Dashboard
-            </Link>
-          </div>
         </Reveal>
       )}
     </AppShell>

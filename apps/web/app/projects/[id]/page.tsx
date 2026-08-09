@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { ApiUnavailable } from "@/components/ApiUnavailable";
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getDashboard, getProject } from "@/lib/api";
 
 type Dashboard = {
@@ -39,6 +40,19 @@ async function loadDashboard(projectId: string): Promise<Dashboard | null> {
   }
 }
 
+/** Coverage states are qualitative, not a percentage — tag color is the only
+ *  signal, so it has to be accurate: verified/evidenced read as done,
+ *  partial as in-progress, missing as not started. */
+function coverageTagClass(coverage: string): string {
+  if (coverage === "verified" || coverage === "evidenced") return "tag tag-ok";
+  if (coverage === "missing") return "tag tag-bad";
+  return "tag";
+}
+
+function severityTagClass(severity: string): string {
+  return severity === "high" ? "tag tag-bad" : "tag";
+}
+
 export default async function ProjectDashboardPage({
   params,
 }: {
@@ -54,9 +68,8 @@ export default async function ProjectDashboardPage({
   const title = project?.name || "Project";
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage={reached} reachedStage={reached}>
       <Reveal>
-        <Stepper current={reached} projectId={id} reachedStage={reached} />
         <h1>{title}</h1>
         <p className="lede">
           Where things stand: score, decisions, and open risks for this project.
@@ -64,14 +77,7 @@ export default async function ProjectDashboardPage({
       </Reveal>
 
       {!dash ? (
-        <div className="error-box" role="alert">
-          Could not load dashboard.
-          <div className="form-actions">
-            <Link href="/" className="btn">
-              Projects
-            </Link>
-          </div>
-        </div>
+        <ApiUnavailable action={{ href: "/", label: "Back to projects" }} />
       ) : (
         <Reveal delay={0.08}>
           <div className="panel blueprint" style={{ marginBottom: 24 }}>
@@ -79,39 +85,40 @@ export default async function ProjectDashboardPage({
             <i className="corner tr" />
             <i className="corner bl" />
             <i className="corner br" />
-            <div className="tag-row" style={{ marginBottom: 12 }}>
-              <span className="tag tag-ok">{dash.lifecycle.label}</span>
-              {dash.package_status ? (
-                <span className="tag">package: {dash.package_status}</span>
-              ) : null}
-              {dash.selected_option ? (
-                <span className="tag tag-ok">
-                  Option: {dash.selected_option.title}
-                </span>
-              ) : null}
-            </div>
-            <div className="form-actions" style={{ marginTop: 0 }}>
-              <Link href={dash.continue_path} className="btn btn-primary">
-                Continue →
-              </Link>
-              <Link href={`/projects/${id}/interview`} className="btn">
-                Interview
-              </Link>
-              <Link href={`/projects/${id}/options`} className="btn">
-                Options
-              </Link>
-              <Link href={`/projects/${id}/package`} className="btn">
-                Package
-              </Link>
-              <Link href={`/projects/${id}/diagrams`} className="btn">
-                Diagrams
-              </Link>
-              <Link href={`/projects/${id}/advisor`} className="btn">
-                Advisor
-              </Link>
-              <Link href={`/projects/${id}/export`} className="btn">
-                Export
-              </Link>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <div className="tag-row">
+                <span className="tag tag-ok">{dash.lifecycle.label}</span>
+                {dash.package_status ? (
+                  <span className="tag">package: {dash.package_status}</span>
+                ) : null}
+                {dash.selected_option ? (
+                  <span className="tag tag-ok">
+                    Option: {dash.selected_option.title}
+                  </span>
+                ) : null}
+              </div>
+              {/* Interview/Options/Package/Export already live in the stage
+                  rail on the left — repeating them here was pure duplication.
+                  Diagrams and Advisor aren't rail stages, so they stay. */}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <Link href={dash.continue_path} className="btn btn-primary">
+                  Continue →
+                </Link>
+                <Link href={`/projects/${id}/diagrams`} className="btn">
+                  Diagrams
+                </Link>
+                <Link href={`/projects/${id}/advisor`} className="btn">
+                  Advisor
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -134,13 +141,23 @@ export default async function ProjectDashboardPage({
                   <p className="muted" style={{ fontSize: 13 }}>
                     Weakest coverage state — decision support, not certification.
                   </p>
-                  <ul className="tradeoff-list" style={{ marginTop: 12 }}>
-                    {dash.quality_score.categories.map((c) => (
-                      <li key={c.id}>
-                        {c.label} ({c.weight}%): <strong>{c.coverage}</strong>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="table-scroll" style={{ marginTop: 12 }}>
+                    <table className="table">
+                      <tbody>
+                        {dash.quality_score.categories.map((c) => (
+                          <tr key={c.id}>
+                            <td>{c.label}</td>
+                            <td className="muted">{c.weight}%</td>
+                            <td>
+                              <span className={coverageTagClass(c.coverage)}>
+                                {c.coverage}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                   {(dash.quality_score.missing_evidence || []).length > 0 ? (
                     <>
                       <div className="card-kicker" style={{ marginTop: 16 }}>
@@ -166,13 +183,23 @@ export default async function ProjectDashboardPage({
               {dash.decisions.length === 0 ? (
                 <p className="muted">No ADRs yet — select an option first.</p>
               ) : (
-                dash.decisions.map((d) => (
-                  <div key={d.id} className="probe-box" style={{ marginBottom: 8 }}>
-                    <span className="tag">{d.id}</span>{" "}
-                    <span className="tag">{d.status}</span>
-                    <div style={{ marginTop: 6 }}>{d.title}</div>
-                  </div>
-                ))
+                <div className="table-scroll">
+                  <table className="table">
+                    <tbody>
+                      {dash.decisions.map((d) => (
+                        <tr key={d.id}>
+                          <td className="mono muted" style={{ whiteSpace: "nowrap" }}>
+                            {d.id}
+                          </td>
+                          <td>{d.title}</td>
+                          <td>
+                            <span className="tag">{d.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </section>
           </div>
@@ -189,17 +216,25 @@ export default async function ProjectDashboardPage({
               {dash.open_risks.length === 0 ? (
                 <p className="muted">No medium/high risks yet.</p>
               ) : (
-                dash.open_risks.map((r) => (
-                  <div key={r.id} className="probe-box" style={{ marginBottom: 8 }}>
-                    <span className="tag">{r.id}</span>{" "}
-                    <span
-                      className={`tag ${r.severity === "high" ? "tag-bad" : ""}`}
-                    >
-                      {r.severity}
-                    </span>
-                    <div style={{ marginTop: 6 }}>{r.title}</div>
-                  </div>
-                ))
+                <div className="table-scroll">
+                  <table className="table">
+                    <tbody>
+                      {dash.open_risks.map((r) => (
+                        <tr key={r.id}>
+                          <td className="mono muted" style={{ whiteSpace: "nowrap" }}>
+                            {r.id}
+                          </td>
+                          <td>{r.title}</td>
+                          <td>
+                            <span className={severityTagClass(r.severity)}>
+                              {r.severity}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </section>
 

@@ -6,9 +6,9 @@ Archavow is a local-first architecture workbench for capturing requirements, clo
 
 > Understand → Design → Decide → Export
 
-[![Archavow final walkthrough](docs/demo/archavow-demo.gif)](docs/demo/archavow-demo.gif)
+[![Archavow final walkthrough](docs/demo/archavow-final-demo-poster.png)](docs/demo/archavow-final-demo.mp4)
 
-[Open the final walkthrough](docs/demo/archavow-demo.gif) · [Run the guided demo](docs/DEMO.md) · [Read the transcript](docs/demo/TRANSCRIPT.md)
+[Watch the final walkthrough (2:17 MP4)](docs/demo/archavow-final-demo.mp4) · [Run the guided demo](docs/DEMO.md) · [Read the transcript](docs/demo/TRANSCRIPT.md)
 
 ## Why Archavow
 
@@ -159,6 +159,8 @@ This permanently deletes local project data.
 
 ## Run the demo
 
+Watch the [complete 2:17 product walkthrough](docs/demo/archavow-final-demo.mp4), or run the scenario yourself using the steps below.
+
 Start the stack, open the application, then follow [docs/DEMO.md](docs/DEMO.md):
 
 ```bash
@@ -173,7 +175,8 @@ The included claims-adjudication scenario demonstrates:
 3. Three architecture alternatives and a human decision
 4. Grounded package generation with Mermaid diagrams
 5. Traceable epics, stories, and technical enablers
-6. Git-ready export
+6. Project-grounded Knowledge Q&A with confidence and source citations
+7. Git-ready export
 
 ## AI and knowledge configuration
 

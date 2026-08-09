@@ -18,7 +18,7 @@ import {
   type IndexEntry,
 } from "@/components/PackageIndex";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getOptions, getPackage, getProject } from "@/lib/api";
 import {
   ARTIFACT_DOC_KEYS,
@@ -197,9 +197,8 @@ export default async function PackagePage({
   }
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage="package" reachedStage={reached}>
       <Reveal>
-        <Stepper current="package" projectId={id} reachedStage={reached} />
         <h1>Architecture package</h1>
         <p className="lede">
           Browse the MVP catalog one artifact at a time. Use the index to jump,
@@ -237,9 +236,6 @@ export default async function PackagePage({
           />
 
           <div className="form-actions" style={{ marginTop: 28 }}>
-            <Link href={`/projects/${id}`} className="btn">
-              Dashboard
-            </Link>
             <Link href={`/projects/${id}/options`} className="btn btn-primary">
               {needsRegen ? "Regenerate package →" : "Change option"}
             </Link>
@@ -251,9 +247,6 @@ export default async function PackagePage({
             </Link>
             <Link href={`/projects/${id}/export`} className="btn btn-primary">
               Export…
-            </Link>
-            <Link href="/" className="btn">
-              Projects
             </Link>
           </div>
         </Reveal>

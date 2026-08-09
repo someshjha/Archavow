@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getProject } from "@/lib/api";
 import { ExportClient } from "./ExportClient";
 
@@ -19,9 +19,8 @@ export default async function ExportPage({
   }
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage="export" reachedStage={reached}>
       <Reveal>
-        <Stepper current="export" projectId={id} reachedStage={reached} />
         <h1>Export</h1>
         <p className="lede">
           Pick what goes in the zip or folder. Keep it boring.

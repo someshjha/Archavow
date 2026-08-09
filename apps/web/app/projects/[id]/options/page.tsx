@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getProject } from "@/lib/api";
 import { OptionsClient } from "./OptionsClient";
 
@@ -21,9 +21,8 @@ export default async function OptionsPage({
   }
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage="options" reachedStage={reached}>
       <Reveal>
-        <Stepper current="options" projectId={id} reachedStage={reached} />
         <h1>{title}</h1>
         <p className="lede">
           Pick one. Nothing else generates — no HLD, no diagrams — until you do.

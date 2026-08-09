@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { BackLink } from "@/components/BackLink";
 import { Reveal } from "@/components/Reveal";
-import { Stepper, type LifecycleStage } from "@/components/Stepper";
+import { type LifecycleStage } from "@/components/Stepper";
 import { getPackage, getProject } from "@/lib/api";
 import { AdvisorClient } from "./AdvisorClient";
 
@@ -18,9 +19,9 @@ export default async function AdvisorPage({
   const reached: LifecycleStage = project?.lifecycle?.stage ?? "package";
 
   return (
-    <AppShell wide>
+    <AppShell wide projectId={id} stage="package" reachedStage={reached}>
       <Reveal>
-        <Stepper current="package" projectId={id} reachedStage={reached} />
+        <BackLink>← Back to package</BackLink>
         <h1>Compare → ADR</h1>
         <p className="lede">
           Decisions leave the room as records, not chat scrollback.

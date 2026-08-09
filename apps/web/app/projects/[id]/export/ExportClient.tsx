@@ -12,6 +12,22 @@ type ExportResult = {
   files: ExportFile[];
 };
 
+function countBy(count: number, singular: string): string {
+  return `${count} ${singular}${count === 1 ? "" : "s"}`;
+}
+
+/** Reads straight from the real file tree returned by the export run — not a
+ *  separate guess at what's inside it. */
+function exportSummary(files: ExportFile[]): string {
+  const adrs = files.filter((f) => f.path.startsWith("decisions/ADR-")).length;
+  const diagrams = files.filter((f) => f.path.startsWith("diagrams/")).length;
+  return [
+    countBy(files.length, "file"),
+    countBy(adrs, "ADR"),
+    countBy(diagrams, "diagram"),
+  ].join(" · ");
+}
+
 export function ExportClient({ projectId }: { projectId: string }) {
   const [includeHld, setIncludeHld] = useState(true);
   const [includeMermaid, setIncludeMermaid] = useState(true);
@@ -205,9 +221,8 @@ export function ExportClient({ projectId }: { projectId: string }) {
           <i className="corner tr" />
           <i className="corner bl" />
           <i className="corner br" />
-          <h2 style={{ fontSize: 18, marginTop: 0 }}>
-            Export ready · {result.files.length} files
-          </h2>
+          <h2 style={{ fontSize: 18, marginTop: 0 }}>Export ready</h2>
+          <p className="export-summary">{exportSummary(result.files)}</p>
           <ul className="export-file-list">
             {result.files.map((f) => (
               <li key={f.path}>

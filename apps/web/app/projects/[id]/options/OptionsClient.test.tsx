@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/link", () => ({
@@ -53,11 +54,20 @@ describe("OptionsClient", () => {
     );
   });
 
-  it("renders generated option cards with fit score", async () => {
+  it("renders generated options in the matrix by default, and in cards on toggle", async () => {
+    const user = userEvent.setup();
     render(<OptionsClient projectId="proj-1" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Managed Kafka")).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: /Managed Kafka/i })).toBeInTheDocument();
+      expect(screen.getByRole("cell", { name: "3" })).toBeInTheDocument();
+      expect(screen.getByRole("cell", { name: "$$" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Cards" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Managed Kafka" })).toBeInTheDocument();
       expect(screen.getByText(/Fit score 3/i)).toBeInTheDocument();
     });
   });

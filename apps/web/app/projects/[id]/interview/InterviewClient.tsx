@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { Bar, noteFor, toneFor } from "@/components/CompletenessBars";
 import type {
   ClarificationQuestion,
   Completeness,
@@ -364,35 +365,6 @@ export function InterviewClient({ projectId }: { projectId: string }) {
   );
 }
 
-type BarTone = "ok" | "warn" | "bad";
-
-function Bar({
-  label,
-  value,
-  tone = "ok",
-  note,
-  emphasis = false,
-}: {
-  label: string;
-  value: number;
-  tone?: BarTone;
-  note?: string | null;
-  emphasis?: boolean;
-}) {
-  return (
-    <div className={`bar-block${emphasis ? " bar-block-lead" : ""}`}>
-      <div className="bar-label">
-        <span>{label}</span>
-        <span className="bar-value">{value}</span>
-      </div>
-      <div className={`bar tone-${tone}`}>
-        <span style={{ width: `${Math.max(value, value > 0 ? 2 : 1)}%` }} />
-      </div>
-      {note ? <p className="bar-note">{note}</p> : null}
-    </div>
-  );
-}
-
 function UnlockList({ checks }: { checks: UnlockCheck[] }) {
   const failing = checks.filter((c) => !c.ok);
   const passing = checks.filter((c) => c.ok);
@@ -420,19 +392,6 @@ function UnlockList({ checks }: { checks: UnlockCheck[] }) {
       ))}
     </div>
   );
-}
-
-function toneFor(cat: CompletenessCategory): BarTone {
-  if (cat.score >= cat.floor) return "ok";
-  return cat.score * 2 < cat.floor ? "bad" : "warn";
-}
-
-function noteFor(cat: CompletenessCategory): string | null {
-  const open = cat.open_labels.join(", ");
-  if (cat.score < cat.floor) {
-    return open ? `needs ${cat.floor} · open: ${open}` : `needs ${cat.floor}`;
-  }
-  return open ? `open: ${open}` : null;
 }
 
 function weakestCategory(comp: Completeness | null): CompletenessCategory | null {

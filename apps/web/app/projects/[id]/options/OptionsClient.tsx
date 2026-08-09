@@ -13,6 +13,7 @@ type OptionDesign = {
 
 type Option = {
   id: string;
+  key?: string;
   title: string;
   summary: string;
   pros: string[];
@@ -22,6 +23,7 @@ type Option = {
   ops_band: string;
   recommended: boolean;
   selected: boolean;
+  stack?: string[];
   origin?: "template" | "ai";
   design?: OptionDesign;
 };
@@ -35,6 +37,7 @@ export function OptionsClient({ projectId }: { projectId: string }) {
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [view, setView] = useState<"matrix" | "cards">("matrix");
 
   function applyPayload(data: {
     options: Option[];
@@ -238,6 +241,121 @@ export function OptionsClient({ projectId }: { projectId: string }) {
         </div>
       ) : null}
 
+      {options.length > 0 ? (
+        <div
+          className="opt-view-toggle"
+          role="group"
+          aria-label="Options view"
+          style={{ marginBottom: 16 }}
+        >
+          <button
+            type="button"
+            className={view === "matrix" ? "is-on" : ""}
+            onClick={() => setView("matrix")}
+            aria-pressed={view === "matrix"}
+          >
+            Matrix
+          </button>
+          <button
+            type="button"
+            className={view === "cards" ? "is-on" : ""}
+            onClick={() => setView("cards")}
+            aria-pressed={view === "cards"}
+          >
+            Cards
+          </button>
+        </div>
+      ) : null}
+
+      {view === "matrix" && options.length > 0 ? (
+        <div className="opt-matrix-wrap" style={{ marginBottom: 24 }}>
+          <table className="opt-matrix">
+            <thead>
+              <tr>
+                <th scope="col" />
+                {options.map((opt) => (
+                  <th
+                    key={opt.id}
+                    scope="col"
+                    className={opt.selected ? "selected-col" : ""}
+                  >
+                    <div className="opt-matrix-head">
+                      {opt.recommended ? (
+                        <span className="tag tag-ok">Recommended</span>
+                      ) : null}
+                      <button
+                        type="button"
+                        className={`opt-matrix-select${opt.selected ? " is-selected" : ""}`}
+                        onClick={() => select(opt.id)}
+                        disabled={pending}
+                      >
+                        <span className="opt-radio" aria-hidden="true" />
+                        <span className="opt-matrix-title">{opt.title}</span>
+                      </button>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Fit score</th>
+                {options.map((opt) => (
+                  <td key={opt.id} className={opt.selected ? "selected-col" : ""}>
+                    {opt.fit_score}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">Cost</th>
+                {options.map((opt) => (
+                  <td key={opt.id} className={opt.selected ? "selected-col" : ""}>
+                    {opt.cost_band || "—"}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">Ops</th>
+                {options.map((opt) => (
+                  <td key={opt.id} className={opt.selected ? "selected-col" : ""}>
+                    {opt.ops_band || "—"}
+                  </td>
+                ))}
+              </tr>
+              {options.some((o) => (o.stack || []).length > 0) ? (
+                <tr>
+                  <th scope="row">Stack</th>
+                  {options.map((opt) => (
+                    <td key={opt.id} className={opt.selected ? "selected-col" : ""}>
+                      {(opt.stack || []).join(", ") || "—"}
+                    </td>
+                  ))}
+                </tr>
+              ) : null}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td />
+                {options.map((opt) => (
+                  <td key={opt.id} className={opt.selected ? "selected-col" : ""}>
+                    <button
+                      type="button"
+                      className={`btn ${opt.selected || opt.recommended ? "btn-primary" : ""}`}
+                      style={{ width: "100%" }}
+                      disabled={pending}
+                      onClick={() => select(opt.id)}
+                    >
+                      {opt.selected ? "Open package" : "Select this"}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      ) : null}
+
+      {view === "cards" ? (
       <div className="options-grid">
         {options.map((opt) => (
           <div
@@ -338,6 +456,7 @@ export function OptionsClient({ projectId }: { projectId: string }) {
           </div>
         ))}
       </div>
+      ) : null}
 
       {!options.length && pending ? (
         <p className="muted">Loading architecture options…</p>

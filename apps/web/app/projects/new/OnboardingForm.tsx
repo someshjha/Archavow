@@ -9,7 +9,6 @@ const EMPTY_FORM = {
   name: "",
   business_objective: "",
   problem_statement: "",
-  requirements: "",
   preferred_cloud: "",
   scale_availability: "",
   tech_constraints: "",
@@ -21,31 +20,29 @@ const DEMO_FORM = {
     "Cut the time from claim submission to decision from five days to under ten minutes for straightforward claims, without increasing leakage.",
   problem_statement:
     "Every claim is adjudicated by hand from email and PDF attachments. Adjusters spend most of their day on simple, low-value claims, complex claims wait behind them, and there is no consistent record of why a claim was approved or declined.",
-  requirements: [
-    "Claimants must submit a claim online with supporting documents and photos.",
-    "The system must validate the policy is active and covers the claimed loss before adjudication.",
-    "Straightforward claims must be adjudicated automatically against the published rules.",
-    "Claims above 5,000 or with missing evidence must be routed to a human adjuster with the reason.",
-    "Suspicious or duplicate claims must be flagged and held for investigation.",
-    "Approved claims must trigger a payment to the claimant's verified account exactly once.",
-    "Claimants must be able to see the current status of their claim without calling support.",
-    "The system must integrate with the existing policy administration system as the system of record.",
-    "Every decision must retain an immutable audit trail for seven years for regulatory review.",
-    "Operations managers must see claim volume, cycle time, and exception rates daily.",
-  ].join("\n"),
   preferred_cloud: "Azure",
   scale_availability:
     "2k claims/hour peak · 99.9% availability · RTO 15m · RPO 1m · decision under 10s",
   tech_constraints: "Java 21, Spring Boot, Kafka, AKS, Postgres, Entra ID",
 };
 
-/** One requirement per line — order is preserved because story traceability
- *  references (R-001, R-002…) are positional. */
-function parseRequirements(text: string): string[] {
-  return text
-    .split("\n")
-    .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim())
-    .filter(Boolean);
+const DEMO_REQUIREMENTS = [
+  "Claimants must submit a claim online with supporting documents and photos.",
+  "The system must validate the policy is active and covers the claimed loss before adjudication.",
+  "Straightforward claims must be adjudicated automatically against the published rules.",
+  "Claims above 5,000 or with missing evidence must be routed to a human adjuster with the reason.",
+  "Suspicious or duplicate claims must be flagged and held for investigation.",
+  "Approved claims must trigger a payment to the claimant's verified account exactly once.",
+  "Claimants must be able to see the current status of their claim without calling support.",
+  "The system must integrate with the existing policy administration system as the system of record.",
+  "Every decision must retain an immutable audit trail for seven years for regulatory review.",
+  "Operations managers must see claim volume, cycle time, and exception rates daily.",
+];
+
+/** Strips a leading bullet/number marker someone pastes in — order is kept
+ *  because story traceability references (R-001, R-002…) are positional. */
+function cleanRequirementLine(text: string): string {
+  return text.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim();
 }
 
 export function OnboardingForm() {
@@ -53,9 +50,27 @@ export function OnboardingForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [reqDraft, setReqDraft] = useState("");
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function addRequirement() {
+    const text = cleanRequirementLine(reqDraft);
+    if (!text) return;
+    setRequirements((prev) => [...prev, text]);
+    setReqDraft("");
+  }
+
+  function removeRequirement(index: number) {
+    setRequirements((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function loadDemo() {
+    setForm(DEMO_FORM);
+    setRequirements(DEMO_REQUIREMENTS);
   }
 
   function deriveStackTags(cloud: string, constraints: string): string[] {
@@ -83,11 +98,6 @@ export function OnboardingForm() {
   const derivedTags = useMemo(
     () => deriveStackTags(form.preferred_cloud, form.tech_constraints),
     [form.preferred_cloud, form.tech_constraints],
-  );
-
-  const requirements = useMemo(
-    () => parseRequirements(form.requirements),
-    [form.requirements],
   );
 
   const completenessHints = useMemo(() => {
@@ -200,42 +210,67 @@ export function OnboardingForm() {
             <div className="card-kicker">3 · Requirements</div>
             <h2 className="onboarding-section-title">What must it do?</h2>
             <p className="muted onboarding-help">
-              One requirement per line, in the words the business uses. These
-              become epics and user stories after you pick an option, and every
-              story cites the line it came from.
+              One requirement per line, in the words the business uses. Each
+              becomes a numbered reference the moment you add it — every story
+              generated later cites the line it came from.
             </p>
-            <div className="field">
-              <label htmlFor="reqs">Requirements</label>
-              <textarea
-                id="reqs"
-                rows={8}
-                value={form.requirements}
-                onChange={(e) => set("requirements", e.target.value)}
-                placeholder={
-                  "Claimants must submit a claim online with supporting documents.\nStraightforward claims must be decided automatically.\nClaims above 5,000 must be reviewed by a human."
-                }
-              />
-              <p className="field-hint">
-                {requirements.length === 0 ? (
-                  "Nothing captured yet — the interview will have to ask for all of it."
-                ) : (
-                  <>
-                    <strong>{requirements.length}</strong>{" "}
-                    {requirements.length === 1 ? "requirement" : "requirements"}{" "}
-                    captured · traced as{" "}
-                    <span className="mono">R-001</span>
-                    {requirements.length > 1 ? (
-                      <>
-                        {"–"}
-                        <span className="mono">
-                          {`R-${String(requirements.length).padStart(3, "0")}`}
-                        </span>
-                      </>
-                    ) : null}
-                  </>
-                )}
-              </p>
+
+            <div className="req-ledger">
+              <div className="req-add">
+                <input
+                  type="text"
+                  value={reqDraft}
+                  onChange={(e) => setReqDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addRequirement();
+                    }
+                  }}
+                  placeholder="e.g. Claims above 5,000 must be reviewed by a human."
+                  aria-label="Add a requirement"
+                />
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={addRequirement}
+                  disabled={!reqDraft.trim()}
+                >
+                  Add
+                </button>
+              </div>
+
+              {requirements.length === 0 ? (
+                <p className="req-empty muted">
+                  Nothing captured yet — the interview will have to ask for
+                  all of it.
+                </p>
+              ) : (
+                requirements.map((text, i) => (
+                  <div className="req-row" key={i}>
+                    <span className="req-row-id">
+                      R-{String(i + 1).padStart(3, "0")}
+                    </span>
+                    <span>{text}</span>
+                    <button
+                      type="button"
+                      className="req-row-remove"
+                      onClick={() => removeRequirement(i)}
+                      aria-label={`Remove requirement R-${String(i + 1).padStart(3, "0")}`}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
+            {requirements.length > 0 ? (
+              <p className="field-hint">
+                <strong>{requirements.length}</strong>{" "}
+                {requirements.length === 1 ? "requirement" : "requirements"}{" "}
+                captured.
+              </p>
+            ) : null}
           </section>
 
           <section className="onboarding-section panel blueprint">
@@ -302,7 +337,7 @@ export function OnboardingForm() {
               type="button"
               className="btn"
               disabled={pending}
-              onClick={() => setForm(DEMO_FORM)}
+              onClick={loadDemo}
             >
               Load demo scenario
             </button>

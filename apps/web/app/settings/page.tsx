@@ -1,3 +1,4 @@
+import { ApiUnavailable } from "@/components/ApiUnavailable";
 import { AppShell } from "@/components/AppShell";
 import { Reveal } from "@/components/Reveal";
 import { getAISettings, getHealth } from "@/lib/api";
@@ -24,11 +25,7 @@ export default async function SettingsPage() {
         </p>
       </Reveal>
 
-      {error ? (
-        <div className="error-box" role="alert">
-          {error}
-        </div>
-      ) : null}
+      {error ? <ApiUnavailable detail={error} /> : null}
 
       {health ? (
         <Reveal delay={0.05}>
@@ -50,25 +47,23 @@ export default async function SettingsPage() {
         </Reveal>
       ) : null}
 
-      <Reveal delay={0.1}>
-        <section className="panel blueprint">
-          <i className="corner tl" />
-          <i className="corner tr" />
-          <i className="corner bl" />
-          <i className="corner br" />
-          <h2>AI providers</h2>
-          <p className="muted" style={{ marginTop: 0 }}>
-            Chat: Ollama or OpenAI. Embeddings: Ollama, OpenAI, or{" "}
-            <strong>none</strong> (keyword retrieval only). Dimensions default to
-            768 for pgvector.
-          </p>
-          {settings ? (
+      {settings ? (
+        <Reveal delay={0.1}>
+          <section className="panel blueprint">
+            <i className="corner tl" />
+            <i className="corner tr" />
+            <i className="corner bl" />
+            <i className="corner br" />
+            <h2>AI providers</h2>
+            <p className="muted" style={{ marginTop: 0 }}>
+              Chat: Ollama or OpenAI. Embeddings: Ollama, OpenAI, or{" "}
+              <strong>none</strong> (keyword retrieval only). Dimensions
+              default to 768 for pgvector.
+            </p>
             <AISettingsForm initial={settings} />
-          ) : (
-            <p className="muted">Settings unavailable.</p>
-          )}
-        </section>
-      </Reveal>
+          </section>
+        </Reveal>
+      ) : null}
     </AppShell>
   );
 }
