@@ -283,6 +283,7 @@ Archavow/
 
 ## Documentation
 
+- [Roadmap](ROADMAP.md) — Now / Next / Later
 - [System architecture](docs/SYSTEM_ARCHITECTURE.md)
 - [Guided demo](docs/DEMO.md)
 - [AI workflows](docs/AI_WORKFLOWS.md)
