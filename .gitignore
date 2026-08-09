@@ -39,3 +39,6 @@ graphify-out/
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Impeccable design hook local state/config
+.impeccable/
