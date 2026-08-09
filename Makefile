@@ -2,7 +2,7 @@
 
 .PHONY: up down ollama-up logs test-api test-api-postgres test-web web-dev psql
 
-up:
+up: ollama-up
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 
 # Host-level Ollama preflight for the default AI_CHAT_PROVIDER=ollama config.
